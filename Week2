@@ -1,1 +1,127 @@
-hAPPY
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyOa+jMds2S70Xb1A9jWOZo+",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/seeuni0320/AI-ML/blob/main/Week2\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "wphw8Nef14G8",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "cb36a96e-7f34-4e72-fd9e-661b777b1987"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "/tmp/ipykernel_3301/2556904344.py:14: DeprecationWarning: Python 3.14 will, by default, filter extracted tar archives and reject files or modify their metadata. Use the filter argument to control this behavior.\n",
+            "  housing_tarball.extractall(path=\"datasets\")\n"
+          ]
+        }
+      ],
+      "source": [
+        "from pathlib import Path\n",
+        "import numpy as np\n",
+        "import urllib.request\n",
+        "import tarfile\n",
+        "import pandas as pd\n",
+        "\n",
+        "def  load_housing_data():\n",
+        "  tarball_path = Path(\"datasets/housing.tgz\")\n",
+        "  if not tarball_path.is_file():\n",
+        "    Path(\"datasets\").mkdir(parents=True, exist_ok=True)\n",
+        "    url = \"https://github.com/ageron/data/raw/main/housing.tgz\"\n",
+        "    urllib.request.urlretrieve(url, tarball_path)\n",
+        "  with tarfile.open(tarball_path) as housing_tarball:\n",
+        "    housing_tarball.extractall(path=\"datasets\")\n",
+        "  return pd.read_csv(Path(\"datasets/housing/housing.csv\"))\n",
+        "\n",
+        "housing = load_housing_data()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "housing[\"income_cat\"] = pd.cut(housing[\"median_income\"],bins=[0., 1.5, 3.0, 4.5, 6., np.inf], labels=[1,2,3,4,5])"
+      ],
+      "metadata": {
+        "id": "EsnQMfZV3uGp"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from sklearn.model_selection import train_test_split\n",
+        "strat_train_set, strat_test_set = train_test_split(housing, test_size=0.2, stratify=housing[\"income_cat\"], random_state=42)"
+      ],
+      "metadata": {
+        "id": "nQZThj504K-W"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "for set_ in (strat_train_set, strat_test_set):\n",
+        "  set_.drop(\"income_cat\", axis=1, inplace=True)"
+      ],
+      "metadata": {
+        "id": "R5u0FQO64s1P"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "housing = strat_train_set.copy()"
+      ],
+      "metadata": {
+        "id": "6EUo3Ky744oX"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "housing_renamed = housing.rename(columns={\"latitude\": \"Latitude\", \"longitude\" : \"Longitude\", \"population\" : \"Population\"})"
+      ],
+      "metadata": {
+        "id": "NqCIhCwm5rBu"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
